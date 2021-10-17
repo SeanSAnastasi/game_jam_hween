@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
-        self.rect.center = (0, 0)
+        self.rect.center = (220, 220)
 
         # Movement variables
         self.move_left = False
@@ -28,6 +28,9 @@ class Player(pygame.sprite.Sprite):
         self.max_health = 5
         self.current_health = self.max_health
 
+        # Bounding box from scene for movement
+        self.movable_area = None
+
     def update(self):
         # any code here will happen every time the game loop updates
         # self.rect.x -= 5
@@ -36,18 +39,13 @@ class Player(pygame.sprite.Sprite):
 
         if self.move_up:
             self.rect.y -= self.movement_speed
-            if self.rect.bottom < 0:
-                self.rect.bottom = 0
         elif self.move_down:
             self.rect.y += self.movement_speed
-            if self.rect.top > 800: #TODO : CHANGE THIS TO SCREEN HEIGHT
-                self.rect.top = 800
         elif self.move_left:
             self.rect.x -= self.movement_speed
-            if self.rect.left < 0:
-                self.rect.left = 0
         elif self.move_right:
             self.rect.x += self.movement_speed
-            # if self.rect.right > 1200: #TODO : CHANGE THIS TO SCREEN WIDTH
-            #     self.rect.right = 1200
+
+        if self.movable_area != None:
+            self.rect.clamp_ip(self.movable_area)
 

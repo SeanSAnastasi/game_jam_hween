@@ -9,13 +9,14 @@ class CastleScene(SceneBase):
         self.player = Player()
         self.all_sprites.add(self.player)
         
+        # pass screen for dimensions
+        self.screen = None
+
         # variables for scene
         self.bounding_box = 50
-        self.display_width = 0
-        self.display_height = 0
 
         # create bounding box
-        self.walls = []
+        self.walls = None
         
 
     
@@ -45,11 +46,19 @@ class CastleScene(SceneBase):
     
     def Update(self):
         self.all_sprites.update()
+        
+        # Do this only after the screen has been passed
+        if self.walls == None:
+            self.walls = self.screen.get_rect()
+            self.walls.w -= self.bounding_box*2
+            self.walls.h -= self.bounding_box*2
+            print(self.walls)
+            self.walls.center = self.screen.get_rect().center
+            self.player.movable_area = self.walls
+
         pass
     
     def Render(self, screen):
-        self.display_width, self.display_height = screen.get_size()
-
         # For the sake of brevity, the title scene is a blank red screen
         screen.fill((255, 0, 0))
         self.all_sprites.draw(screen)
