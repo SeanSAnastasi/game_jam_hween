@@ -1,5 +1,5 @@
 import pygame
-from scenes.ExampleScene import GameScene
+from scenes.CastleScene import CastleScene
 
 def run_game(width, height, fps, starting_scene):
     pygame.init()
@@ -40,4 +40,4 @@ def run_game(width, height, fps, starting_scene):
         clock.tick(fps)
 
 # Change parameters here for different screen sizes, FPS and starting scenes
-run_game(400, 300, 60, GameScene())
+run_game(1200, 800, 30, CastleScene())
