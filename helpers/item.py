@@ -12,7 +12,25 @@ class Syringe(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
-        self.rect.center = (220, 220)
+        self.rect.center = (600, 400)
+
+    def get_change(self):
+        movement_speed = 0
+        damage = 1
+        shot_speed = 0
+        shot_delay = 0
+        max_health = 0
+        current_health = 0
+        change = {
+            "type"              : "stats",
+            "movement_speed"    : movement_speed,
+            "damage"            : damage,
+            "shot_speed"        : shot_speed,
+            "shot_delay"        : shot_delay,
+            "max_health"        : max_health,
+            "current_health"    : current_health
+        }
+        return change
 
  
     def update(self):
@@ -29,8 +47,25 @@ class Bottle(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
-        self.rect.center = (220, 220)
+        self.rect.center = (600, 400)
 
+    def get_change(self):
+        movement_speed = 0
+        damage = 0
+        shot_speed = 1
+        shot_delay = 0
+        max_health = 0
+        current_health = 0
+        change = {
+            "type"              : "refresh",
+            "movement_speed"    : movement_speed,
+            "damage"            : damage,
+            "shot_speed"        : shot_speed,
+            "shot_delay"        : shot_delay,
+            "max_health"        : max_health,
+            "current_health"    : current_health
+        }
+        return change
 
     def update(self):
         pass
@@ -46,8 +81,25 @@ class Flask(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
-        self.rect.center = (220, 220)
+        self.rect.center = (600, 400)
 
+    def get_change(self):
+        movement_speed = 0
+        damage = 0
+        shot_speed = 0
+        shot_delay = 1
+        max_health = 0
+        current_health = 0
+        change = {
+            "type"              : "stats",
+            "movement_speed"    : movement_speed,
+            "damage"            : damage,
+            "shot_speed"        : shot_speed,
+            "shot_delay"        : shot_delay,
+            "max_health"        : max_health,
+            "current_health"    : current_health
+        }
+        return change
 
     def update(self):
         pass
@@ -63,8 +115,25 @@ class ChocBar(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
-        self.rect.center = (220, 220)
+        self.rect.center = (600, 400)
 
+    def get_change(self):
+        movement_speed = 1
+        damage = 0
+        shot_speed = 0
+        shot_delay = 0
+        max_health = 0
+        current_health = 0
+        change = {
+            "type"              : "stats",
+            "movement_speed"    : movement_speed,
+            "damage"            : damage,
+            "shot_speed"        : shot_speed,
+            "shot_delay"        : shot_delay,
+            "max_health"        : max_health,
+            "current_health"    : current_health
+        }
+        return change
 
     def update(self):
         pass
@@ -80,8 +149,25 @@ class Candy(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
-        self.rect.center = (220, 220)
+        self.rect.center = (600, 400)
 
+    def get_change(self):
+        movement_speed = 0
+        damage = 0
+        shot_speed = 0
+        shot_delay = 0
+        max_health = 1
+        current_health = 0
+        change = {
+            "type"              : "effect",
+            "movement_speed"    : movement_speed,
+            "damage"            : damage,
+            "shot_speed"        : shot_speed,
+            "shot_delay"        : shot_delay,
+            "max_health"        : max_health,
+            "current_health"    : current_health
+        }
+        return change
 
     def update(self):
         pass
