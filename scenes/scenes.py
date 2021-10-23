@@ -1,17 +1,25 @@
 import pygame
 import random
-from scenes.SceneBase import SceneBase
 from helpers.player import Player
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
-from helpers.room import Room, TreatRoom, TrickRoom
+from helpers.room import BossRoom, Room, TreatRoom, TrickRoom
 
-class CaveScene(SceneBase):
-    def __init__(self):
-        SceneBase.__init__(self)
+
+class SceneBase:
+
+
+    def SwitchToScene(self, next_scene):
+        self.next = next_scene
+    
+    def Terminate(self):
+        self.SwitchToScene(None)
+
+    def __init__(self, background_img, background_music, next_scene, player):
+        self.next = self
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player()
+        self.player = player
         self.all_sprites.add(self.player)
-        
+        print([self.player.movement_speed,self.player.damage,self.player.shot_speed,self.player.shot_delay,self.player.max_health,self.player.current_health])
         # pass screen for dimensions
         self.screen = None
 
@@ -25,31 +33,43 @@ class CaveScene(SceneBase):
         self.current_room = Room(self.player)
         self.current_room.screen = self.screen
 
+        self.background_img = pygame.image.load(background_img)
+        self.background_img = pygame.transform.scale(self.background_img, (1200,800))
+        self.background_img.get_rect().center = (600, 400)
+
+        self.next_scene = next_scene
+
         # Placeholder before map generation
         self.room1 = TrickRoom(self.player)
         self.room2 = TreatRoom(self.player)
         self.room3 = TrickRoom(self.player)
         self.room4 = TrickRoom(self.player)
         self.room5 = TreatRoom(self.player)
+        self.boss_room = BossRoom(self.player)
 
-        self.room1.setSouth(self.room2)
+        self.room1.setNorth(self.room2)
         self.room2.setEast(self.room3)
-        self.room4.setNorth(self.room5)
-        self.current_room.setEast(self.room1)
-        self.current_room.setSouth(self.room4)
+        self.room4.setSouth(self.room5)
+        self.room4.setNorth(self.boss_room)
+        self.current_room.setNorth(self.room1)
+        self.current_room.setWest(self.room4)
+
+
 
         
 
     
     def ProcessInput(self, events, pressed_keys):
         self.player.ProcessInput(events, pressed_keys)
-
         
        
     def checkCollisions(self):
         hit = self.current_room.checkCollision()
         if hit:
-            self.current_room = hit
+            if hit == "next":
+                self.SwitchToScene(self.next_scene(self.player))
+            else:    
+                self.current_room = hit
                 
     
     def Update(self):
@@ -67,10 +87,22 @@ class CaveScene(SceneBase):
         pass
     
     def Render(self, screen):
-        # For the sake of brevity, the title scene is a blank red screen
-        screen.fill((255, 0, 0))
+        
+        screen.blit(self.background_img, (0,0))
         self.all_sprites.draw(screen)
         self.current_room.draw(screen)
 
     def generateFloor():
         pass
+
+class CastleScene(SceneBase):
+    def __init__(self):
+        SceneBase.__init__(self, "assets/images/1st_floor.png", "", CaveScene, Player())
+
+class CaveScene(SceneBase):
+    def __init__(self, player):
+        SceneBase.__init__(self, "assets/images/2nd_floor.png", "", DungeonScene, player)
+
+class DungeonScene(SceneBase, Player):
+    def __init__(self):
+        SceneBase.__init__(self, "assets/images/3rd_floor.png", "", CaveScene, player)

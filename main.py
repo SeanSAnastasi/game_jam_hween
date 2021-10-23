@@ -1,5 +1,5 @@
 import pygame
-from scenes.CastleScene import CastleScene
+from scenes.scenes import CastleScene
 
 def run_game(width, height, fps, starting_scene):
     pygame.init()

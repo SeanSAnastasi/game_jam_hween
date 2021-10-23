@@ -2,14 +2,14 @@ import pygame
 import random
 
 from pygame.event import get
-from scenes.SceneBase import SceneBase
+
 from helpers.player import Player, Shot
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
-from helpers.door import Door, NorthDoor, SouthDoor, WestDoor, EastDoor
+from helpers.door import Door, NorthDoor, SouthDoor, TrapDoor, WestDoor, EastDoor
 
-class Room(SceneBase):
+class Room():
     def __init__(self, player):
-        SceneBase.__init__(self)
+        
         self.player_sprite_group = pygame.sprite.Group()
         self.enemy_sprite_group = pygame.sprite.Group()
         self.obstacle_sprite_group = pygame.sprite.Group()
@@ -22,9 +22,7 @@ class Room(SceneBase):
         self.screen = None
 
         # self.background = (random.randint(0,255),random.randint(0,255),random.randint(0,255)) 
-        self.background_img = pygame.image.load("assets/images/3rd_floor_bg.png")
-        self.background_img = pygame.transform.scale(self.background_img, (1200,800))
-        self.background_img.get_rect().center = (600, 400)
+        
 
         # Places for other rooms
         self.north = None
@@ -60,9 +58,12 @@ class Room(SceneBase):
                 elif type(hit) == type(WestDoor()):
                     self.player.move_player(1000,None)
                     return self.west
+                elif type(hit) == type(TrapDoor()):
+                    self.player.move_player(600,400)
+                    return "next"
 
     def draw(self, screen):
-        screen.blit(self.background_img, (0,0))
+        
         for all_sprites in self.sprite_groups:
             all_sprites.draw(screen)
         
@@ -127,4 +128,7 @@ class TreatRoom(Room):
 class BossRoom(Room):
     def __init__(self, player):
         super().__init__(player)
-        self.boss_killed = True
+        self.killBoss()
+        
+    def killBoss(self):
+        self.door_sprite_group.add(TrapDoor())

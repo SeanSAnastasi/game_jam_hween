@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
-        self.rect.center = (220, 220)
+        self.rect.center = (600, 400)
 
         # Movement variables
         self.move_left = False

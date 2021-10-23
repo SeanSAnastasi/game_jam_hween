@@ -33,3 +33,13 @@ class EastDoor(Door):
         self.image = pygame.transform.rotate(self.image, -90)
         self.image.set_colorkey((0,0,0))
         self.rect.center = (1145,400)
+
+class TrapDoor(Door):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("assets/images/door1Top.png")
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() *2, self.image.get_height()*2))
+        self.rect = self.image.get_rect()
+        self.image = pygame.transform.rotate(self.image, -90)
+        self.image.set_colorkey((0,0,0))
+        self.rect.center = (600,400)
