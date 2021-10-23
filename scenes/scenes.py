@@ -7,13 +7,6 @@ from helpers.room import BossRoom, Room, TreatRoom, TrickRoom
 
 class SceneBase:
 
-
-    def SwitchToScene(self, next_scene):
-        self.next = next_scene
-    
-    def Terminate(self):
-        self.SwitchToScene(None)
-
     def __init__(self, background_img, background_music, next_scene, player):
         self.next = self
         self.all_sprites = pygame.sprite.Group()
@@ -38,6 +31,12 @@ class SceneBase:
         self.background_img.get_rect().center = (600, 400)
 
         self.next_scene = next_scene
+
+        if background_music:
+            pygame.mixer.init()
+            pygame.mixer.music.load(background_music)
+            pygame.mixer.music.play(-1)
+            pass
 
         # Placeholder before map generation
         self.room1 = TrickRoom(self.player)
@@ -95,14 +94,21 @@ class SceneBase:
     def generateFloor():
         pass
 
+    def SwitchToScene(self, next_scene):
+        self.next = next_scene
+    
+    def Terminate(self):
+        self.SwitchToScene(None)
+
+
 class CastleScene(SceneBase):
     def __init__(self):
-        SceneBase.__init__(self, "assets/images/1st_floor.png", "", CaveScene, Player())
+        SceneBase.__init__(self, "assets/images/1st_floor.png", "assets/music/castle_song.wav", CaveScene, Player())
 
 class CaveScene(SceneBase):
     def __init__(self, player):
-        SceneBase.__init__(self, "assets/images/2nd_floor.png", "", DungeonScene, player)
+        SceneBase.__init__(self, "assets/images/2nd_floor.png", "assets/music/cave_song.wav", DungeonScene, player)
 
 class DungeonScene(SceneBase, Player):
-    def __init__(self):
-        SceneBase.__init__(self, "assets/images/3rd_floor.png", "", CaveScene, player)
+    def __init__(self, player):
+        SceneBase.__init__(self, "assets/images/3rd_floor.png", "assets/music/dungeon_song.wav", CaveScene, player)
