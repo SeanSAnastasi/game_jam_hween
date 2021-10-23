@@ -1,8 +1,11 @@
 import pygame
 import random
+
+from pygame.event import get
 from scenes.SceneBase import SceneBase
 from helpers.player import Player, Shot
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
+from helpers.door import Door, NorthDoor, SouthDoor, WestDoor, EastDoor
 
 class Room(SceneBase):
     def __init__(self, player):
@@ -10,62 +13,92 @@ class Room(SceneBase):
         self.player_sprite_group = pygame.sprite.Group()
         self.enemy_sprite_group = pygame.sprite.Group()
         self.obstacle_sprite_group = pygame.sprite.Group()
-        self.sprite_groups = [self.player_sprite_group,self.enemy_sprite_group, self.obstacle_sprite_group]
+        self.door_sprite_group = pygame.sprite.Group()
+        self.sprite_groups = [self.player_sprite_group,self.enemy_sprite_group, self.obstacle_sprite_group, self.door_sprite_group]
         self.player = player
         self.player_sprite_group.add(self.player)
 
         # pass screen for dimensions
         self.screen = None
 
-        # variables for scene
-        self.bounding_box = 50
+        # self.background = (random.randint(0,255),random.randint(0,255),random.randint(0,255)) 
+        self.background_img = pygame.image.load("assets/images/3rd_floor_bg.png")
+        self.background_img = pygame.transform.scale(self.background_img, (1200,800))
+        self.background_img.get_rect().center = (600, 400)
 
-        # create bounding box
-        self.walls = None
-
-        self.background = (random.randint(0,255),random.randint(0,255),random.randint(0,255)) 
-
+        # Places for other rooms
+        self.north = None
+        self.south = None
+        self.west = None
+        self.east = None
+      
 
     def update(self):
+        
         for all_sprites in self.sprite_groups:
             all_sprites.update()
-        # Do this only after the screen has been passed
-        if self.walls == None and self.screen != None:
-            self.walls = self.screen.get_rect()
-            self.walls.w -= self.bounding_box*2
-            self.walls.h -= self.bounding_box*2
-            self.walls.center = self.screen.get_rect().center
-            self.player.movable_area = self.walls
 
-        # add new shots to the sprite group
         
-
+        # add new shots to the sprite group
         for shot in self.player.get_new_shots():
             self.player_sprite_group.add(shot)
             self.player.clear_new_shots()
 
-        
-        pass
+    def checkCollision(self):
+        gets_hit = pygame.sprite.spritecollide(self.player, self.door_sprite_group, False)
+        if gets_hit:
+            for hit in gets_hit:
+                if type(hit) == type(NorthDoor()):
+                    self.player.move_player(None,600)
+                    return self.north
+                elif type(hit) == type(SouthDoor()):
+                    self.player.move_player(None,200)
+                    return self.south
+                elif type(hit) == type(EastDoor()):
+                    self.player.move_player(200,None)
+                    return self.east
+                elif type(hit) == type(WestDoor()):
+                    self.player.move_player(1000,None)
+                    return self.west
 
     def draw(self, screen):
-        screen.fill(self.background)
+        screen.blit(self.background_img, (0,0))
         for all_sprites in self.sprite_groups:
             all_sprites.draw(screen)
-        pass
+        
+    def getDoorSpriteGroup(self):
+        return self.door_sprite_group
+    def setNorth(self, north):
+        self.north = north
+        self.door_sprite_group.add(NorthDoor())
+        north.south = self
+        north.door_sprite_group.add(SouthDoor())
+    def setSouth(self, south):
+        self.south = south
+        self.door_sprite_group.add(SouthDoor())
+        south.north = self
+        south.door_sprite_group.add(NorthDoor())
+    def setEast(self, east):
+        self.east = east
+        self.door_sprite_group.add(EastDoor())
+        east.west = self
+        east.door_sprite_group.add(WestDoor())
+    def setWest(self, west):
+        self.west = west
+        self.door_sprite_group.add(WestDoor())
+        west.east = self
+        west.door_sprite_group.add(EastDoor())
     
-    def checkCollisions(self):
-        pass
-    
-class TrickRoom():
+class TrickRoom(Room):
     def __init__(self, player):
+        super(TrickRoom, self).__init__(player)
 
-        pass
 
     def update(self):
-        pass
+        super().update()
 
     def draw(self, screen):
-        pass
+        super().draw(screen)
 
 class TreatRoom(Room):
     def __init__(self, player):
@@ -76,26 +109,22 @@ class TreatRoom(Room):
         item = random.choice(self.item_list)
         self.item_sprite_group.add(item())
 
-        # Places for other rooms
-        self.north = None
-        self.south = None
-        self.west = None
-        self.east = None
-
     def update(self):
-        super().update()
+        super(TreatRoom, self).update()
         self.checkCollisions()
         pass
 
     def draw(self, screen):
-        super().draw(screen)
+        super(TreatRoom, self).draw(screen)
         pass
 
     def checkCollisions(self):
-        super().checkCollisions()
         gets_hit = pygame.sprite.spritecollide(self.player, self.item_sprite_group, True)
 
         for item in gets_hit:
             self.player.updateStats(item.get_change())
 
-    
+class BossRoom(Room):
+    def __init__(self, player):
+        super().__init__(player)
+        self.boss_killed = True
