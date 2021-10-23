@@ -83,6 +83,17 @@ class Player(pygame.sprite.Sprite):
     def clear_new_shots(self):
         self.new_shots = []
 
+    def move_player(self, x, y):
+        move_x = x
+        move_y = y
+        if x == None:
+            move_x = self.rect.x
+        if y == None:
+            move_y = self.rect.y
+
+        self.rect.x = move_x
+        self.rect.y = move_y
+
     def updateStats(self, stats):
         self.movement_speed += stats["movement_speed"]
         self.damage += stats["damage"]

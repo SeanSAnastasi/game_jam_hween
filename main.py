@@ -5,8 +5,8 @@ def run_game(width, height, fps, starting_scene):
     pygame.init()
     screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
-
-    active_scene = starting_scene
+    
+    active_scene = starting_scene()
 
     while active_scene != None:
         pressed_keys = pygame.key.get_pressed()
@@ -41,4 +41,4 @@ def run_game(width, height, fps, starting_scene):
         clock.tick(fps)
 
 # Change parameters here for different screen sizes, FPS and starting scenes
-run_game(1200, 800, 30, CastleScene())
+run_game(1200, 800, 30, CastleScene)
