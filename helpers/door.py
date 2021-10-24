@@ -6,6 +6,7 @@ class Door(pygame.sprite.Sprite):
         self.image = pygame.image.load("assets/images/door1Top.png")
         self.image = pygame.transform.scale(self.image, (self.image.get_width() *3, self.image.get_height()*3))
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
 
 class NorthDoor(Door):
     def __init__(self):

@@ -22,6 +22,7 @@ class Enemy(pygame.sprite.Sprite):
         # center the sprite on the screen
         self.rect.center = (x, y)
 
+        self.mask = pygame.mask.from_surface(self.image)
 
         self.max_health = 6
         self.current_health = self.max_health
@@ -42,11 +43,11 @@ class Enemy(pygame.sprite.Sprite):
 
 class Draugr(Enemy):
     def __init__(self):
-        super().__init__("assets/images/draugr.png", 600, 400, 2)
+        super().__init__("assets/images/draugr.png", 600, 400, 3)
 
 class Ghost(Enemy):
     def __init__(self):
-        super().__init__("assets/images/ghost.png", 600, 400, 2)
+        super().__init__("assets/images/ghost.png", 600, 400, 3)
 
 class Golem(Enemy):
     def __init__(self):

@@ -2,6 +2,7 @@ import pygame
 import random
 
 from pygame.event import get
+from helpers.obstacle import Bonepile, Chest, Gravestone, Rock, Web
 
 from helpers.player import Player, Shot
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
@@ -16,7 +17,7 @@ class Room():
         self.obstacle_sprite_group = pygame.sprite.Group()
         self.door_sprite_group = pygame.sprite.Group()
         self.shot_sprite_group = pygame.sprite.Group()
-        self.sprite_groups = [self.player_sprite_group,self.enemy_sprite_group, self.obstacle_sprite_group, self.door_sprite_group, self.shot_sprite_group]
+        self.sprite_groups = [self.enemy_sprite_group, self.obstacle_sprite_group, self.door_sprite_group, self.shot_sprite_group,self.player_sprite_group]
         self.player = player
         self.player_sprite_group.add(self.player)
 
@@ -31,7 +32,9 @@ class Room():
         self.south = None
         self.west = None
         self.east = None
-      
+
+        
+
 
     def update(self):
         
@@ -45,18 +48,20 @@ class Room():
             self.player.clear_new_shots()
 
     def checkCollision(self):
-        gets_hit = pygame.sprite.spritecollide(self.player, self.door_sprite_group, False)
+        
+        gets_hit = pygame.sprite.spritecollide(self.player, self.door_sprite_group, False, pygame.sprite.collide_mask)
         if gets_hit:
+            self.player.target_counter = 0
             self.shot_sprite_group.empty()
             for hit in gets_hit:
                 if type(hit) == type(NorthDoor()):
-                    self.player.move_player(None,600)
+                    self.player.move_player(None,580)
                     return self.north
                 elif type(hit) == type(SouthDoor()):
-                    self.player.move_player(None,200)
+                    self.player.move_player(None,120)
                     return self.south
                 elif type(hit) == type(EastDoor()):
-                    self.player.move_player(200,None)
+                    self.player.move_player(80,None)
                     return self.east
                 elif type(hit) == type(WestDoor()):
                     self.player.move_player(1000,None)
@@ -68,12 +73,12 @@ class Room():
         
         for enemy in self.enemy_sprite_group:
 
-            gets_hit = pygame.sprite.spritecollide(enemy, self.shot_sprite_group, True)
+            gets_hit = pygame.sprite.spritecollide(enemy, self.shot_sprite_group, True, pygame.sprite.collide_mask)
 
             if gets_hit:
                 enemy.takeDamage(gets_hit[0].damage)
 
-            gets_hit = pygame.sprite.spritecollide(enemy, self.player_sprite_group, False)
+            gets_hit = pygame.sprite.spritecollide(enemy, self.player_sprite_group, False, pygame.sprite.collide_mask)
 
             if gets_hit:
                 gets_hit[0].collided = True
@@ -85,8 +90,32 @@ class Room():
             else:
                 self.player.collided = False
 
-        
-        
+        gets_hit = pygame.sprite.spritecollide(self.player, self.obstacle_sprite_group, False, pygame.sprite.collide_mask)
+
+        if gets_hit:
+            
+            if type(gets_hit[0]) != type(Web(0,0)):
+                direction = self.determineSide(self.player.rect, gets_hit[0].rect)
+                if direction == "top":
+                    self.player.prevent_up = True
+                elif direction == "bottom":
+                    self.player.prevent_down = True
+                elif direction == "left":
+                    self.player.prevent_left = True
+                elif direction == "right":
+                    self.player.prevent_right = True
+            elif type(gets_hit[0]) == type(Web(0,0)):
+                self.player.prevent_up = False
+                self.player.prevent_down = False
+                self.player.prevent_left = False
+                self.player.prevent_right = False
+                self.player.movement_speed = self.player.slow_speed
+        else:
+            self.player.prevent_up = False
+            self.player.prevent_down = False
+            self.player.prevent_left = False
+            self.player.prevent_right = False
+            self.player.movement_speed = self.player.normal_speed
 
     def draw(self, screen):
         
@@ -116,12 +145,30 @@ class Room():
         west.east = self
         west.door_sprite_group.add(EastDoor())
     
+    def determineSide(self,rect1, rect2):
+        if rect1.midtop[1] > rect2.midtop[1]:
+            return "top"
+        elif rect1.midleft[0] > rect2.midleft[0]:
+            return "left"
+        elif rect1.midright[0] < rect2.midright[0]:
+            return "right"
+        else:
+            return "bottom"
+
 class TrickRoom(Room):
     def __init__(self, player):
         super(TrickRoom, self).__init__(player)
         enemy_list = [Draugr, Golem, Ghost, Spider]
         enemy = random.choice(enemy_list)
         self.enemy_sprite_group.add(enemy())
+        # Add random obstacles max 10
+        is_obstacle = random.choices(population=[True, False], weights=[0.3,0.7], k=10)
+        for i in is_obstacle:
+            if i:
+                self.obstacle_list = [Rock, Web, Bonepile, Chest, Gravestone]
+                self.obstacle_list_weights = [0.3,0.2,0.3,0.1,0.3]
+                obstacle = random.choices(population=self.obstacle_list, weights=self.obstacle_list_weights, k=1)
+                self.obstacle_sprite_group.add(obstacle[0](random.randint(1,15), random.randint(1,9)))
 
     def update(self):
         super().update()
@@ -137,6 +184,13 @@ class TreatRoom(Room):
         self.item_list = [Syringe, Bottle, Flask, ChocBar, Candy]
         item = random.choice(self.item_list)
         self.item_sprite_group.add(item())
+        # Add random obstacles max 10
+        is_obstacle = random.choices(population=[True, False], weights=[0.3,0.7], k=10)
+        for i in is_obstacle:
+            if i:
+                self.obstacle_list = [Rock, Web, Bonepile, Chest, Gravestone]
+                obstacle = random.choice(self.obstacle_list)
+                self.obstacle_sprite_group.add(obstacle(random.randint(1,15), random.randint(1,9)))
 
     def update(self):
         super(TreatRoom, self).update()
@@ -160,6 +214,13 @@ class BossRoom(Room):
         enemy = random.choice(enemy_list)
         self.boss = enemy()
         self.enemy_sprite_group.add(self.boss)
+        # Add random obstacles max 10
+        is_obstacle = random.choices(population=[True, False], weights=[0.3,0.7], k=10)
+        for i in is_obstacle:
+            if i:
+                self.obstacle_list = [Rock, Web, Bonepile, Chest, Gravestone]
+                obstacle = random.choice(self.obstacle_list)
+                self.obstacle_sprite_group.add(obstacle(random.randint(1,15), random.randint(1,9)))
 
         
     def update(self):

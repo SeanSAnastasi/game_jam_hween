@@ -13,6 +13,8 @@ class Player(pygame.sprite.Sprite):
         # center the sprite on the screen
         self.rect.center = (600, 400)
 
+        self.mask = pygame.mask.from_surface(self.image)
+
         # Base Stats
         self.movement_speed = 5
         self.damage = 1
@@ -30,12 +32,14 @@ class Player(pygame.sprite.Sprite):
         self.shoot_right = False
         self.shoot_down = False
         self.shoot_up = False
-        self.shot_frames = 30/self.shot_delay
+        self.shot_frames = int(30/self.shot_delay)
         self.shot_counter = self.shot_frames
         self.collided = False
         self.targetable = True
-        self.iframes = 30
-        self.target_counter = 30
+        self.iframes = 45
+        self.target_counter = self.iframes
+        self.slow_speed = self.movement_speed/2
+        self.normal_speed = self.movement_speed
 
         self.image_flipped = False
 
@@ -43,6 +47,12 @@ class Player(pygame.sprite.Sprite):
         self.movable_area = None
 
         self.new_shots = []
+
+        # used for collision with obstacles
+        self.prevent_up = False
+        self.prevent_down = False
+        self.prevent_left = False
+        self.prevent_right = False
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -83,20 +93,20 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         # self.shot_delay += 0.1
-        self.shot_frames = 30/self.shot_delay
+        self.shot_frames = int(30/self.shot_delay)
 
         if not(self.collided):
-            if self.move_up:
+            if self.move_up and not(self.prevent_up):
                 self.rect.y -= self.movement_speed
-            elif self.move_down:
+            elif self.move_down and not(self.prevent_down):
                 self.rect.y += self.movement_speed
-            elif self.move_left:
+            elif self.move_left and not(self.prevent_left):
                 if not(self.image_flipped):
                     print("flip")
                     self.image = pygame.transform.flip(self.image, True, False)
                     self.image_flipped = True
                 self.rect.x -= self.movement_speed
-            elif self.move_right:
+            elif self.move_right and not(self.prevent_right):
                 if self.image_flipped:
                     print("flip")
                     self.image = pygame.transform.flip(self.image, True, False)
@@ -113,13 +123,13 @@ class Player(pygame.sprite.Sprite):
                 self.rect.x -= self.movement_speed*3
         
         # For iframes
-        if self.target_counter < 30:
+        if self.target_counter < self.iframes:
             self.target_counter += 1    
         else:
             self.targetable = True
         # For shots
         if self.shoot_down or self.shoot_left or self.shoot_right or self.shoot_up:
-            if self.shot_counter == self.shot_frames:
+            if self.shot_counter >= self.shot_frames:
                 self.shot_counter = 0
                 if self.shoot_down:
                     self.shoot("south")
@@ -161,6 +171,8 @@ class Player(pygame.sprite.Sprite):
 
     def updateStats(self, stats):
         self.movement_speed += stats["movement_speed"]
+        self.normal_speed = self.movement_speed
+        self.slow_speed = self.movement_speed/2
         self.damage += stats["damage"]
         self.shot_speed += stats["shot_speed"]
         self.shot_delay += stats["shot_delay"]
@@ -180,7 +192,8 @@ class Shot(pygame.sprite.Sprite):
         
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
-        # center the sprite on the screen
+        
+        self.mask = pygame.mask.from_surface(self.image)
 
         # This is done for generic with type
         if player != None:

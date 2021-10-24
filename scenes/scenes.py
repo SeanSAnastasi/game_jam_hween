@@ -17,7 +17,7 @@ class SceneBase:
         self.screen = None
 
         # variables for sce  
-        self.bounding_box = 100
+        self.bounding_box = 65
 
         # create bounding box
         self.walls = None
