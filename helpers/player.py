@@ -1,5 +1,4 @@
 import pygame
-from pygame.mixer import fadeout
 
 class Player(pygame.sprite.Sprite):
     # sprite for the Player
@@ -7,26 +6,38 @@ class Player(pygame.sprite.Sprite):
         # this line is required to properly create the sprite
         pygame.sprite.Sprite.__init__(self)
         # create a plain rectangle for the sprite image
-        self.image = pygame.Surface((50, 50))
-        self.image.fill((0,0,0))
+        self.image = pygame.image.load("assets/images/player.png")
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() *4, self.image.get_height()*4))
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
         self.rect.center = (600, 400)
+
+        # Base Stats
+        self.movement_speed = 5
+        self.damage = 1
+        self.shot_speed = 10
+        self.shot_delay = 1
+        self.max_health = 5
+        self.current_health = self.max_health   
 
         # Movement variables
         self.move_left = False
         self.move_right = False
         self.move_down = False
         self.move_up = False
+        self.shoot_left = False
+        self.shoot_right = False
+        self.shoot_down = False
+        self.shoot_up = False
+        self.shot_frames = 30/self.shot_delay
+        self.shot_counter = self.shot_frames
+        self.collided = False
+        self.targetable = True
+        self.iframes = 30
+        self.target_counter = 30
 
-        # Base Stats
-        self.movement_speed = 5
-        self.damage = 1
-        self.shot_speed = 10
-        self.shot_delay = 2
-        self.max_health = 5
-        self.current_health = self.max_health
+        self.image_flipped = False
 
         # Bounding box from scene for movement
         self.movable_area = None
@@ -45,7 +56,13 @@ class Player(pygame.sprite.Sprite):
                 elif event.key == pygame.K_d:
                     self.move_right = True
                 elif event.key == pygame.K_RIGHT:
-                    self.shoot()
+                    self.shoot_right = True
+                elif event.key == pygame.K_LEFT:
+                    self.shoot_left = True
+                elif event.key == pygame.K_DOWN:
+                    self.shoot_down = True
+                elif event.key == pygame.K_UP:
+                    self.shoot_up = True
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_w:
                     self.move_up = False
@@ -55,26 +72,73 @@ class Player(pygame.sprite.Sprite):
                     self.move_down = False
                 if event.key == pygame.K_d:
                     self.move_right = False
+                elif event.key == pygame.K_RIGHT:
+                    self.shoot_right = False
+                elif event.key == pygame.K_LEFT:
+                    self.shoot_left = False
+                elif event.key == pygame.K_DOWN:
+                    self.shoot_down = False
+                elif event.key == pygame.K_UP:
+                    self.shoot_up = False
 
     def update(self):
-        # any code here will happen every time the game loop updates
-        # self.rect.x -= 5
-        # if self.rect.left < 0:
-        #     self.rect.left = 0
-        if self.move_up:
-            self.rect.y -= self.movement_speed
-        elif self.move_down:
-            self.rect.y += self.movement_speed
-        elif self.move_left:
-            self.rect.x -= self.movement_speed
-        elif self.move_right:
-            self.rect.x += self.movement_speed
+        # self.shot_delay += 0.1
+        self.shot_frames = 30/self.shot_delay
+
+        if not(self.collided):
+            if self.move_up:
+                self.rect.y -= self.movement_speed
+            elif self.move_down:
+                self.rect.y += self.movement_speed
+            elif self.move_left:
+                if not(self.image_flipped):
+                    print("flip")
+                    self.image = pygame.transform.flip(self.image, True, False)
+                    self.image_flipped = True
+                self.rect.x -= self.movement_speed
+            elif self.move_right:
+                if self.image_flipped:
+                    print("flip")
+                    self.image = pygame.transform.flip(self.image, True, False)
+                    self.image_flipped = False
+                self.rect.x += self.movement_speed
+        else:
+            if self.move_up:
+                self.rect.y += self.movement_speed*3
+            elif self.move_down:
+                self.rect.y -= self.movement_speed*3
+            elif self.move_left:
+                self.rect.x += self.movement_speed*3
+            elif self.move_right:
+                self.rect.x -= self.movement_speed*3
+        
+        # For iframes
+        if self.target_counter < 30:
+            self.target_counter += 1    
+        else:
+            self.targetable = True
+        # For shots
+        if self.shoot_down or self.shoot_left or self.shoot_right or self.shoot_up:
+            if self.shot_counter == self.shot_frames:
+                self.shot_counter = 0
+                if self.shoot_down:
+                    self.shoot("south")
+                elif self.shoot_up:
+                    self.shoot("north")
+                elif self.shoot_left:
+                    self.shoot("west")
+                elif self.shoot_right:
+                    self.shoot("east")
+        if self.shot_counter < self.shot_frames:
+            self.shot_counter += 1
 
         if self.movable_area != None:
             self.rect.clamp_ip(self.movable_area)
+        
+        
 
     def shoot(self, direction=None):
-        shot = Shot(self.damage, self.shot_speed, self)
+        shot = Shot(direction, self.damage, self.shot_speed, self)
         self.new_shots.append(shot)
     
     def get_new_shots(self):
@@ -84,6 +148,7 @@ class Player(pygame.sprite.Sprite):
         self.new_shots = []
 
     def move_player(self, x, y):
+        
         move_x = x
         move_y = y
         if x == None:
@@ -106,13 +171,13 @@ class Player(pygame.sprite.Sprite):
 
 class Shot(pygame.sprite.Sprite):
 
-    def __init__(self, damage=0, shot_speed=0, player=None):
+    def __init__(self, direction, damage=0, shot_speed=0, player=None):
         pygame.sprite.Sprite.__init__(self)
         self.damage = damage
         self.shot_speed = shot_speed
 
-        self.image = pygame.Surface((15, 15))
-        self.image.fill((255,255,255))
+        self.image = pygame.image.load("assets/images/spitball.png")
+        
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
@@ -120,6 +185,31 @@ class Shot(pygame.sprite.Sprite):
         # This is done for generic with type
         if player != None:
             self.rect.center = player.rect.center
+            self.direction = direction
+
+            if self.direction == "north":
+                self.image = pygame.transform.rotate(self.image, 90)
+            elif self.direction == "south":
+                self.image = pygame.transform.rotate(self.image, -90)
+            elif self.direction == "west":
+                self.image = pygame.transform.rotate(self.image, 180)
+                if not(player.image_flipped):
+                    player.image = pygame.transform.flip(player.image, True, False)
+                    player.image_flipped = True
+            elif self.direction == "east":
+                if player.image_flipped:
+                    player.image = pygame.transform.flip(player.image, True, False)
+                    player.image_flipped = False
 
     def update(self):
-        self.rect.x += self.shot_speed
+        if self.direction == "north":
+            self.rect.y -= self.shot_speed
+        elif self.direction == "south":
+            self.rect.y += self.shot_speed
+        elif self.direction == "west":
+            self.rect.x -= self.shot_speed
+        elif self.direction == "east":
+            self.rect.x += self.shot_speed
+
+        if self.rect.x < 50 or self.rect.x > 1150 or self.rect.y < 50 or self.rect.y > 750:
+            self.kill()

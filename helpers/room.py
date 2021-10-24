@@ -6,6 +6,7 @@ from pygame.event import get
 from helpers.player import Player, Shot
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
 from helpers.door import Door, NorthDoor, SouthDoor, TrapDoor, WestDoor, EastDoor
+from helpers.enemy import Alfredo, MuscleBoi, Plant, Spider, Draugr, Ghost, Golem, Bob
 
 class Room():
     def __init__(self, player):
@@ -14,7 +15,8 @@ class Room():
         self.enemy_sprite_group = pygame.sprite.Group()
         self.obstacle_sprite_group = pygame.sprite.Group()
         self.door_sprite_group = pygame.sprite.Group()
-        self.sprite_groups = [self.player_sprite_group,self.enemy_sprite_group, self.obstacle_sprite_group, self.door_sprite_group]
+        self.shot_sprite_group = pygame.sprite.Group()
+        self.sprite_groups = [self.player_sprite_group,self.enemy_sprite_group, self.obstacle_sprite_group, self.door_sprite_group, self.shot_sprite_group]
         self.player = player
         self.player_sprite_group.add(self.player)
 
@@ -39,12 +41,13 @@ class Room():
         
         # add new shots to the sprite group
         for shot in self.player.get_new_shots():
-            self.player_sprite_group.add(shot)
+            self.shot_sprite_group.add(shot)
             self.player.clear_new_shots()
 
     def checkCollision(self):
         gets_hit = pygame.sprite.spritecollide(self.player, self.door_sprite_group, False)
         if gets_hit:
+            self.shot_sprite_group.empty()
             for hit in gets_hit:
                 if type(hit) == type(NorthDoor()):
                     self.player.move_player(None,600)
@@ -61,6 +64,29 @@ class Room():
                 elif type(hit) == type(TrapDoor()):
                     self.player.move_player(600,400)
                     return "next"
+            
+        
+        for enemy in self.enemy_sprite_group:
+
+            gets_hit = pygame.sprite.spritecollide(enemy, self.shot_sprite_group, True)
+
+            if gets_hit:
+                enemy.takeDamage(gets_hit[0].damage)
+
+            gets_hit = pygame.sprite.spritecollide(enemy, self.player_sprite_group, False)
+
+            if gets_hit:
+                gets_hit[0].collided = True
+                if gets_hit[0].target_counter == self.player.iframes:            
+                    gets_hit[0].current_health -= 1
+                    gets_hit[0].targetable = False
+                    gets_hit[0].target_counter = 0
+                    print(self.player.current_health)
+            else:
+                self.player.collided = False
+
+        
+        
 
     def draw(self, screen):
         
@@ -93,7 +119,9 @@ class Room():
 class TrickRoom(Room):
     def __init__(self, player):
         super(TrickRoom, self).__init__(player)
-
+        enemy_list = [Draugr, Golem, Ghost, Spider]
+        enemy = random.choice(enemy_list)
+        self.enemy_sprite_group.add(enemy())
 
     def update(self):
         super().update()
@@ -128,7 +156,16 @@ class TreatRoom(Room):
 class BossRoom(Room):
     def __init__(self, player):
         super().__init__(player)
-        self.killBoss()
+        enemy_list = [Alfredo, Bob, MuscleBoi, Plant]
+        enemy = random.choice(enemy_list)
+        self.boss = enemy()
+        self.enemy_sprite_group.add(self.boss)
+
         
+    def update(self):
+        super().update()
+        if self.boss.current_health <= 0:
+            self.killBoss()
+
     def killBoss(self):
         self.door_sprite_group.add(TrapDoor())

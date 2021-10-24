@@ -35,7 +35,7 @@ class SceneBase:
         if background_music:
             pygame.mixer.init()
             pygame.mixer.music.load(background_music)
-            pygame.mixer.music.play(-1)
+            # pygame.mixer.music.play(-1)
             pass
 
         # Placeholder before map generation
