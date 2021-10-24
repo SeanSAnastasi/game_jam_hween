@@ -17,7 +17,7 @@ class Room():
         self.obstacle_sprite_group = pygame.sprite.Group()
         self.door_sprite_group = pygame.sprite.Group()
         self.shot_sprite_group = pygame.sprite.Group()
-        self.sprite_groups = [self.enemy_sprite_group, self.obstacle_sprite_group, self.door_sprite_group, self.shot_sprite_group,self.player_sprite_group]
+        self.sprite_groups = [self.obstacle_sprite_group, self.door_sprite_group, self.shot_sprite_group,self.player_sprite_group, self.enemy_sprite_group]
         self.player = player
         self.player_sprite_group.add(self.player)
 
@@ -33,13 +33,9 @@ class Room():
         self.west = None
         self.east = None
 
-        
-
-
     def update(self):
         
-        for all_sprites in self.sprite_groups:
-            all_sprites.update()
+        
 
         
         # add new shots to the sprite group
@@ -47,10 +43,22 @@ class Room():
             self.shot_sprite_group.add(shot)
             self.player.clear_new_shots()
 
+        # Update screen for enemy where applicable
+        # print(self.screen)
+        for enemy in self.enemy_sprite_group:
+            if type(enemy) == type(Golem(self.player)) and self.screen:
+                enemy.screen = self.screen
+                pygame.draw.circle(self.screen, (255, 20, 0), (600, 400), 20, 2)
+                # if enemy.circle_timer >= enemy.circle_time:
+                #     pygame.draw.circle(self.screen, (255, 20, 0), (enemy.rect.x, enemy.rect.y), enemy.circle_radius, 2)
+
+        for all_sprites in self.sprite_groups:
+            all_sprites.update()
+
     def checkCollision(self):
         
         gets_hit = pygame.sprite.spritecollide(self.player, self.door_sprite_group, False, pygame.sprite.collide_mask)
-        if gets_hit:
+        if gets_hit and not(self.enemy_sprite_group):
             self.player.target_counter = 0
             self.shot_sprite_group.empty()
             for hit in gets_hit:
@@ -86,9 +94,16 @@ class Room():
                     gets_hit[0].current_health -= 1
                     gets_hit[0].targetable = False
                     gets_hit[0].target_counter = 0
-                    print(self.player.current_health)
+                    # print(self.player.current_health)
             else:
                 self.player.collided = False
+        
+        for obstacle in self.obstacle_sprite_group:
+            gets_hit = pygame.sprite.spritecollide(obstacle, self.shot_sprite_group, False, pygame.sprite.collide_mask)
+
+            if gets_hit:
+                if type(gets_hit[0]) != type(Web(0,0)):
+                    gets_hit[0].kill()
 
         gets_hit = pygame.sprite.spritecollide(self.player, self.obstacle_sprite_group, False, pygame.sprite.collide_mask)
 
@@ -121,6 +136,13 @@ class Room():
         
         for all_sprites in self.sprite_groups:
             all_sprites.draw(screen)
+
+        for enemy in self.enemy_sprite_group:
+            if type(enemy) == type(Golem(self.player)) and self.screen:
+                if enemy.circle_timer >= enemy.circle_time:
+                    pygame.draw.circle(self.screen, (255, 20, 0), (enemy.circle_pos_x, enemy.circle_pos_y), enemy.circle_radius, 2)
+        
+        
         
     def getDoorSpriteGroup(self):
         return self.door_sprite_group
@@ -159,8 +181,11 @@ class TrickRoom(Room):
     def __init__(self, player):
         super(TrickRoom, self).__init__(player)
         enemy_list = [Draugr, Golem, Ghost, Spider]
+        number_of_enemies = [4, 3, 5, 10]
         enemy = random.choice(enemy_list)
-        self.enemy_sprite_group.add(enemy())
+        for i in range(random.randint(1, number_of_enemies[enemy_list.index(enemy)])):          
+                self.enemy_sprite_group.add(enemy(player))
+            
         # Add random obstacles max 10
         is_obstacle = random.choices(population=[True, False], weights=[0.3,0.7], k=10)
         for i in is_obstacle:
@@ -212,7 +237,7 @@ class BossRoom(Room):
         super().__init__(player)
         enemy_list = [Alfredo, Bob, MuscleBoi, Plant]
         enemy = random.choice(enemy_list)
-        self.boss = enemy()
+        self.boss = enemy(player)
         self.enemy_sprite_group.add(self.boss)
         # Add random obstacles max 10
         is_obstacle = random.choices(population=[True, False], weights=[0.3,0.7], k=10)
@@ -221,12 +246,15 @@ class BossRoom(Room):
                 self.obstacle_list = [Rock, Web, Bonepile, Chest, Gravestone]
                 obstacle = random.choice(self.obstacle_list)
                 self.obstacle_sprite_group.add(obstacle(random.randint(1,15), random.randint(1,9)))
+        
+        self.boss_dead = False
 
         
     def update(self):
         super().update()
-        if self.boss.current_health <= 0:
+        if self.boss.current_health <= 0 and not(self.boss_dead):
             self.killBoss()
+            self.boss_dead = True
 
     def killBoss(self):
         self.door_sprite_group.add(TrapDoor())

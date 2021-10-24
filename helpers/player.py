@@ -102,13 +102,13 @@ class Player(pygame.sprite.Sprite):
                 self.rect.y += self.movement_speed
             elif self.move_left and not(self.prevent_left):
                 if not(self.image_flipped):
-                    print("flip")
+                    
                     self.image = pygame.transform.flip(self.image, True, False)
                     self.image_flipped = True
                 self.rect.x -= self.movement_speed
             elif self.move_right and not(self.prevent_right):
                 if self.image_flipped:
-                    print("flip")
+                    
                     self.image = pygame.transform.flip(self.image, True, False)
                     self.image_flipped = False
                 self.rect.x += self.movement_speed
