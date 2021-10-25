@@ -125,19 +125,19 @@ class Golem(Enemy):
             
             if self.circle_timer >= self.circle_time:
                 self.speed = 0
-                if self.circle_pos_x == -1:
-                    self.circle_pos_x = self.rect.center[0]
-                if self.circle_pos_y == -1:
-                    self.circle_pos_y = self.rect.center[1]
+                # if self.circle_pos_x == -1:
+                #     self.circle_pos_x = self.rect.center[0]
+                # if self.circle_pos_y == -1:
+                #     self.circle_pos_y = self.rect.center[1]
                 self.circle_radius += 5
                 if self.circle_radius >= self.max_circle_radius:
                     self.circle_timer = 0
             else:
-                print("nocircle")
+                # print("nocircle")
                 self.circle_timer += 1
                 self.circle_radius = 20
-                self.circle_pos_x = -1
-                self.circle_pos_y = -1
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
                 self.speed = 3
  
 

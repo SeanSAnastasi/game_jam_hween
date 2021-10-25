@@ -33,6 +33,8 @@ class Room():
         self.west = None
         self.east = None
 
+        self.enemy_sprite_group.add(Golem(self.player))
+
     def update(self):
         
         
@@ -137,10 +139,10 @@ class Room():
         for all_sprites in self.sprite_groups:
             all_sprites.draw(screen)
 
-        for enemy in self.enemy_sprite_group:
-            if type(enemy) == type(Golem(self.player)) and self.screen:
-                if enemy.circle_timer >= enemy.circle_time:
-                    pygame.draw.circle(self.screen, (255, 20, 0), (enemy.circle_pos_x, enemy.circle_pos_y), enemy.circle_radius, 2)
+        # for enemy in self.enemy_sprite_group:
+        #     if type(enemy) == type(Golem(self.player)) and self.screen:
+        #         if enemy.circle_timer >= enemy.circle_time:
+        #             pygame.draw.circle(self.screen, (255, 20, 0), (enemy.circle_pos_x, enemy.circle_pos_y), enemy.circle_radius, 2)
         
         
         
