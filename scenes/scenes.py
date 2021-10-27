@@ -163,7 +163,7 @@ class CastleScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self, "assets/images/1st_floor.png", "assets/music/castle_song.wav", CaveScene, Player(), 1)
         self.generateFloor(0.1)
-        self.SwitchToScene(self.next_scene(self.player))
+        
 
 class CaveScene(SceneBase):
     def __init__(self, player):
