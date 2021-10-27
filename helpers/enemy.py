@@ -16,7 +16,7 @@ class Enemy(pygame.sprite.Sprite):
         else:
            
             self.image = pygame.image.load(image)
-            self.image = pygame.transform.scale(self.image, (self.image.get_width() *multiplier, self.image.get_height()*multiplier))
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *multiplier), int(self.image.get_height()*multiplier)))
             self.image.set_colorkey((0,0,0))
         
 
@@ -57,10 +57,13 @@ class Draugr(Enemy):
          # Find direction vector (dx, dy) between enemy and player.
         dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
         dist = math.hypot(dx, dy)
-        dx, dy = dx / dist, dy / dist  # Normalize.
-        # Move along this normalized vector towards the player at current speed.
-        self.rect.x += dx * self.speed
-        self.rect.y += dy * self.speed
+        try:
+            dx, dy = dx / dist, dy / dist  # Normalize.
+            # Move along this normalized vector towards the player at current speed.
+            self.rect.x += dx * self.speed
+            self.rect.y += dy * self.speed
+        except:
+            print("under you")
 
 class Ghost(Enemy):
     def __init__(self, player):
@@ -79,24 +82,31 @@ class Ghost(Enemy):
             # Find direction vector (dx, dy) between enemy and player.
             dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
             dist = math.hypot(dx, dy)
-            dx, dy = dx / dist, dy / dist  # Normalize.
-            # Move along this normalized vector towards the player at current speed.
-            self.rect.x += dx * self.speed
-            self.rect.y += dy * self.speed
+            try:
+                dx, dy = dx / dist, dy / dist  # Normalize.
+                # Move along this normalized vector towards the player at current speed.
+                self.rect.x += dx * self.speed
+                self.rect.y += dy * self.speed
+                
+            except:
+                print("under you")
             self.start_timer += 1
-
             if self.start_timer >= self.start_time:
                 self.stop_timer = 0 
         else:
             dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
             dist = math.hypot(dx, dy)
-            dx, dy = dx / dist, dy / dist  # Normalize.
-            # Move along this normalized vector towards the player at current speed.
-            self.rect.x -= dx * self.back_speed
-            self.rect.y += dy * self.back_speed
+            try:
+                dx, dy = dx / dist, dy / dist  # Normalize.
+                # Move along this normalized vector towards the player at current speed.
+                self.rect.x -= dx * self.back_speed
+                self.rect.y += dy * self.back_speed
+            except:
+                print("under you")
             self.start_timer += 1
             self.start_timer = 0
             self.stop_timer += 1
+            
 
 class Golem(Enemy):
     def __init__(self, player):
@@ -117,10 +127,13 @@ class Golem(Enemy):
          # Find direction vector (dx, dy) between enemy and player.
         dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
         dist = math.hypot(dx, dy)
-        dx, dy = dx / dist, dy / dist  # Normalize.
-        # Move along this normalized vector towards the player at current speed.
-        self.rect.x += dx * self.speed
-        self.rect.y += dy * self.speed
+        try:
+            dx, dy = dx / dist, dy / dist  # Normalize.
+            # Move along this normalized vector towards the player at current speed.
+            self.rect.x += dx * self.speed
+            self.rect.y += dy * self.speed
+        except:
+            print("under you")
         if self.screen:
             
             if self.circle_timer >= self.circle_time:
@@ -159,10 +172,13 @@ class Spider(Enemy):
             # Find direction vector (dx, dy) between enemy and player.
             dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
             dist = math.hypot(dx, dy)
-            dx, dy = dx / dist, dy / dist  # Normalize.
-            # Move along this normalized vector towards the player at current speed.
-            self.rect.x += dx * self.speed
-            self.rect.y += dy * self.speed
+            try:
+                dx, dy = dx / dist, dy / dist  # Normalize.
+                # Move along this normalized vector towards the player at current speed.
+                self.rect.x += dx * self.speed
+                self.rect.y += dy * self.speed
+            except:
+                print("under you")
             self.start_timer += 1
 
             if self.start_timer >= self.start_time:

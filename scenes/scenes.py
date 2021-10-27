@@ -3,6 +3,7 @@ import random
 from helpers.player import Player
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
 from helpers.room import BossRoom, Room, TreatRoom, TrickRoom
+from helpers.ui import UI
 
 
 class SceneBase:
@@ -15,7 +16,7 @@ class SceneBase:
         # print([self.player.movement_speed,self.player.damage,self.player.shot_speed,self.player.shot_delay,self.player.max_health,self.player.current_health])
         # pass screen for dimensions
         self.screen = None
-
+        self.ui = UI(self.player)
         # variables for sce  
         self.bounding_box = 65
 
@@ -37,26 +38,6 @@ class SceneBase:
             pygame.mixer.music.load(background_music)
             # pygame.mixer.music.play(-1)
             pass
-
-        # Placeholder before map generation
-        # self.room1 = TrickRoom(self.player)
-        # self.room2 = TreatRoom(self.player)
-        # self.room3 = TrickRoom(self.player)
-        # self.room4 = TrickRoom(self.player)
-        # self.room5 = TreatRoom(self.player)
-        # self.boss_room = BossRoom(self.player)
-
-        # self.room1.setNorth(self.room2)
-        # self.room2.setEast(self.room3)
-        # self.room4.setSouth(self.room5)
-        # self.room4.setNorth(self.boss_room)
-        # self.current_room.setNorth(self.room1)
-        # self.current_room.setWest(self.room4)
-
-
-
-        
-
     
     def ProcessInput(self, events, pressed_keys):
         self.player.ProcessInput(events, pressed_keys)
@@ -88,6 +69,7 @@ class SceneBase:
         
         self.current_room.update()
         self.all_sprites.update()
+        self.ui.update()
     
     def Render(self, screen):
         
@@ -95,10 +77,11 @@ class SceneBase:
         
         self.current_room.draw(screen)
         self.all_sprites.draw(screen)
+        self.ui.draw(screen)
 
     def generateFloor(self, degredation):
         room_stack = [self.current_room] 
-        room_types = [TrickRoom, TreatRoom]
+        room_types = [TreatRoom, TrickRoom]
         last_room = self.current_room
         room_chance = 1
 

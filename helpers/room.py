@@ -8,6 +8,7 @@ from helpers.player import Player, Shot
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
 from helpers.door import Door, NorthDoor, SouthDoor, TrapDoor, WestDoor, EastDoor
 from helpers.enemy import Alfredo, MuscleBoi, Plant, Spider, Draugr, Ghost, Golem, Bob
+from helpers.ui import FullHeart
 
 class Room():
     def __init__(self, player):
@@ -33,7 +34,7 @@ class Room():
         self.west = None
         self.east = None
 
-        self.enemy_sprite_group.add(Golem(self.player))
+        self.obstacle_sprite_group.add(Chest(5,5))
 
     def update(self):
         
@@ -96,9 +97,25 @@ class Room():
                     gets_hit[0].current_health -= 1
                     gets_hit[0].targetable = False
                     gets_hit[0].target_counter = 0
+                    
+                    direction = self.determineSide(self.player.rect, gets_hit[0].rect)
+                    if direction == "top":
+                        self.player.prevent_up = True
+                    elif direction == "bottom":
+                        self.player.prevent_down = True
+                    elif direction == "left":
+                        self.player.prevent_left = True
+                    elif direction == "right":
+                        self.player.prevent_right = True
+                
                     # print(self.player.current_health)
             else:
                 self.player.collided = False
+                self.player.prevent_up = False
+                self.player.prevent_down = False
+                self.player.prevent_left = False
+                self.player.prevent_right = False
+                self.player.movement_speed = self.player.normal_speed
         
         for obstacle in self.obstacle_sprite_group:
             gets_hit = pygame.sprite.spritecollide(obstacle, self.shot_sprite_group, False, pygame.sprite.collide_mask)
@@ -121,6 +138,17 @@ class Room():
                     self.player.prevent_left = True
                 elif direction == "right":
                     self.player.prevent_right = True
+
+                if type(gets_hit[0]) == type(Chest(0,0)):
+                    if not(gets_hit[0].open):
+                        gets_hit[0].openChest()
+                        # print(gets_hit[0].getPosition()[0])
+                        self.obstacle_sprite_group.add(FullHeart(gets_hit[0].getPosition()[0] + 50, gets_hit[0].getPosition()[1] - 50))
+                if type(gets_hit[0]) == type(FullHeart(0,0)):
+                    if self.player.current_health < self.player.max_health:
+                        gets_hit[0].kill()
+                        self.player.current_health += 1
+                        return
             elif type(gets_hit[0]) == type(Web(0,0)):
                 self.player.prevent_up = False
                 self.player.prevent_down = False

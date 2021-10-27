@@ -58,9 +58,19 @@ class Web(Obstacle):
 
 class Chest(Obstacle):
     def __init__(self, x, y):
-        x_pos = 100+(x*64)
-        y_pos = 90+(y*64)
-        super().__init__("assets/images/chest_closed.png",  x_pos, y_pos, 4)
+        self.x_pos = 100+(x*64)
+        self.y_pos = 90+(y*64)
+        self.open = False
+        super().__init__("assets/images/chest_closed.png",  self.x_pos, self.y_pos, 4)
+    
+    def openChest(self):
+        self.image = pygame.image.load("assets/images/chest_open.png")
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() *4, self.image.get_height()*4))
+        self.image.set_colorkey((0,0,0))
+        self.open = True
+
+    def getPosition(self):
+        return [self.x_pos, self.y_pos]
 
 class Gravestone(Obstacle):
     def __init__(self, x, y):

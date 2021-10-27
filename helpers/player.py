@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.shot_speed = 10
         self.shot_delay = 1
         self.max_health = 5
-        self.current_health = self.max_health   
+        self.current_health = self.max_health  
 
         # Movement variables
         self.move_left = False
@@ -95,32 +95,32 @@ class Player(pygame.sprite.Sprite):
         # self.shot_delay += 0.1
         self.shot_frames = int(30/self.shot_delay)
 
-        if not(self.collided):
-            if self.move_up and not(self.prevent_up):
-                self.rect.y -= self.movement_speed
-            elif self.move_down and not(self.prevent_down):
-                self.rect.y += self.movement_speed
-            elif self.move_left and not(self.prevent_left):
-                if not(self.image_flipped):
-                    
-                    self.image = pygame.transform.flip(self.image, True, False)
-                    self.image_flipped = True
-                self.rect.x -= self.movement_speed
-            elif self.move_right and not(self.prevent_right):
-                if self.image_flipped:
-                    
-                    self.image = pygame.transform.flip(self.image, True, False)
-                    self.image_flipped = False
-                self.rect.x += self.movement_speed
-        else:
-            if self.move_up:
-                self.rect.y += self.movement_speed*3
-            elif self.move_down:
-                self.rect.y -= self.movement_speed*3
-            elif self.move_left:
-                self.rect.x += self.movement_speed*3
-            elif self.move_right:
-                self.rect.x -= self.movement_speed*3
+        
+        if self.move_up and not(self.prevent_up):
+            self.rect.y -= self.movement_speed
+        elif self.move_down and not(self.prevent_down):
+            self.rect.y += self.movement_speed
+        elif self.move_left and not(self.prevent_left):
+            if not(self.image_flipped):
+                
+                self.image = pygame.transform.flip(self.image, True, False)
+                self.image_flipped = True
+            self.rect.x -= self.movement_speed
+        elif self.move_right and not(self.prevent_right):
+            if self.image_flipped:
+                
+                self.image = pygame.transform.flip(self.image, True, False)
+                self.image_flipped = False
+            self.rect.x += self.movement_speed
+        # else:
+        #     if self.move_up:
+        #         self.rect.y += self.movement_speed*3
+        #     elif self.move_down:
+        #         self.rect.y -= self.movement_speed*3
+        #     elif self.move_left:
+        #         self.rect.x += self.movement_speed*3
+        #     elif self.move_right:
+        #         self.rect.x -= self.movement_speed*3
         
         # For iframes
         if self.target_counter < self.iframes:
@@ -178,6 +178,21 @@ class Player(pygame.sprite.Sprite):
         self.shot_delay += stats["shot_delay"]
         self.max_health += stats["max_health"]
         self.current_health += stats["current_health"]
+
+        if self.movement_speed < 2:
+            self.movement_speed = 2
+            self.normal_speed = self.movement_speed
+            self.slow_speed = self.movement_speed/2
+        if self.damage < 1:
+            self.damage = 1
+        if self.shot_speed < 4:
+            self.shot_speed = 4
+        if self.shot_delay < 1:
+            self.shot_delay = 1
+        if self.max_health < 1:
+            self.max_health = 1
+        if self.current_health < 1:
+            self.current_health = 1
 
         print([self.movement_speed,self.damage,self.shot_speed,self.shot_delay,self.max_health,self.current_health])
 
