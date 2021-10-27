@@ -23,6 +23,10 @@ class Obstacle(pygame.sprite.Sprite):
         # find the rectangle that encloses the image
         self.rect = self.image.get_rect()
         # center the sprite on the screen
+        if x in [6,7,8]:
+            x +=3
+        if y in [3,4,5]:
+            y +=3
         self.rect.center = (x, y)
 
         self.mask = pygame.mask.from_surface(self.image)

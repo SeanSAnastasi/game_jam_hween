@@ -34,7 +34,7 @@ class Room():
         self.west = None
         self.east = None
 
-        self.enemy_sprite_group.add(Ghost(self.player))
+        self.enemy_sprite_group.add(Plant(self.player))
 
     def update(self):
         
