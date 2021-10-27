@@ -179,8 +179,8 @@ class Player(pygame.sprite.Sprite):
         self.max_health += stats["max_health"]
         self.current_health += stats["current_health"]
 
-        if self.movement_speed < 2:
-            self.movement_speed = 2
+        if self.movement_speed < 5:
+            self.movement_speed = 5
             self.normal_speed = self.movement_speed
             self.slow_speed = self.movement_speed/2
         if self.damage < 1:

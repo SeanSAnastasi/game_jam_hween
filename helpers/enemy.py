@@ -76,6 +76,9 @@ class Ghost(Enemy):
         self.start_time =  random.randint(30,40)
         self.stop_timer = 0
         self.start_timer = 0
+        self.frame = 0
+        self.frame_swap_at = 4
+        self.frame_swap_counter = 0
 
 
     def update(self):
@@ -88,6 +91,26 @@ class Ghost(Enemy):
                 # Move along this normalized vector towards the player at current speed.
                 self.rect.x += dx * self.speed
                 self.rect.y += dy * self.speed
+                file_num = str(self.frame % 4)
+                while len(file_num) < 4:
+                    file_num = "0"+file_num
+                file = "assets/animations/ghost-move/ghost-move"+file_num+".png"
+                print(file)
+                if os.path.exists(file) and self.speed >0:
+                    
+                    center = self.rect.center
+                    self.image = pygame.image.load(file)
+                    if center[0] > self.player.rect.x:
+                        self.image = pygame.transform.flip(self.image, True, False)
+                    self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *3), int(self.image.get_height()*3)))
+                    self.image.set_colorkey((0,0,0))
+                    self.rect = self.image.get_rect()
+                    self.rect.center = center
+                    self.mask = pygame.mask.from_surface(self.image)
+                    self.frame_swap_counter += 1
+                    if self.frame_swap_counter >= self.frame_swap_at:
+                        self.frame += 1
+                        self.frame_swap_counter = 0
                 
             except:
                 print("under you")
@@ -121,7 +144,9 @@ class Golem(Enemy):
         self.screen = None
         self.circle_pos_x = -1
         self.circle_pos_y = -1
-
+        self.frame = 0
+        self.frame_swap_at = 4
+        self.frame_swap_counter = 0
 
     def update(self):
         # pygame.draw.circle(self.screen, (255, 20, 0), (600, 400), 20, 2)
@@ -133,6 +158,26 @@ class Golem(Enemy):
             # Move along this normalized vector towards the player at current speed.
             self.rect.x += dx * self.speed
             self.rect.y += dy * self.speed
+            file_num = str(self.frame % 4)
+            while len(file_num) < 4:
+                file_num = "0"+file_num
+            file = "assets/animations/golem-walk/golem-walk"+file_num+".png"
+            print(file)
+            if os.path.exists(file) and self.speed >0:
+                
+                center = self.rect.center
+                self.image = pygame.image.load(file)
+                if center[0] < self.player.rect.x:
+                    self.image = pygame.transform.flip(self.image, True, False)
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *2), int(self.image.get_height()*2)))
+                self.image.set_colorkey((255,255,255))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+                self.frame_swap_counter += 1
+                if self.frame_swap_counter >= self.frame_swap_at:
+                    self.frame += 1
+                    self.frame_swap_counter = 0
         except:
             print("under you")
         if self.screen:
@@ -717,6 +762,10 @@ class PomPom(Enemy):
             # print(self.img)
             center = self.rect.center
             self.image = pygame.image.load(file)
+            # print(center[0])
+            # print()
+            if center[0] < self.player.rect.x:
+                self.image = pygame.transform.flip(self.image, True, False)
             self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
             self.image.set_colorkey((0,0,0))
             self.rect = self.image.get_rect()

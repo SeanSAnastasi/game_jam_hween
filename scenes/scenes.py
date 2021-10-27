@@ -171,7 +171,7 @@ class CaveScene(SceneBase):
 
 class DungeonScene(SceneBase):
     def __init__(self, player):
-        SceneBase.__init__(self, "assets/images/3rd_floor.png", "assets/music/dungeon_song.wav", CaveScene, player, 20)
+        SceneBase.__init__(self, "assets/images/3rd_floor.png", "assets/music/dungeon_song.wav", End, player, 20)
         self.generateFloor(0.005)
 
 class End(SceneBase):
