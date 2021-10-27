@@ -353,7 +353,7 @@ class Bob(Enemy):
 
 class Plant(Enemy):
     def __init__(self, player):
-        super().__init__("assets/images/plant.png", 600, 400, 1)
+        super().__init__("assets/images/plant.png", 600, 400, 0.8)
         self.max_health = 30
         self.current_health = self.max_health
         self.player = player
@@ -364,37 +364,230 @@ class Plant(Enemy):
         self.screen = None
         self.circle_pos_x = -1
         self.circle_pos_y = -1
-    
+        self.atk = None
+        self.frame = 0
+        self.transformed = False
     def update(self):
-        # pygame.draw.circle(self.screen, (255, 20, 0), (600, 400), 20, 2)
-         # Find direction vector (dx, dy) between enemy and player.
-        dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
-        dist = math.hypot(dx, dy)
-        try:
-            dx, dy = dx / dist, dy / dist  # Normalize.
-            # Move along this normalized vector towards the player at current speed.
-            self.rect.x += dx * self.speed
-            self.rect.y += dy * self.speed
-        except:
-            print("under you")
-        
+        print(self.transformed)
+        if self.atk == None:
+            dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
+            dist = math.hypot(dx, dy)
+            try:
+                dx, dy = dx / dist, dy / dist  # Normalize.
+                # Move along this normalized vector towards the player at current speed.
+                # self.rect.x += dx * self.speed
+                # self.rect.y += dy * self.speed
+            except:
+                print("under you")
             
-        if self.circle_timer >= self.circle_time:
-            self.speed = 0
-            # if self.circle_pos_x == -1:
-            #     self.circle_pos_x = self.rect.center[0]
-            # if self.circle_pos_y == -1:
-            #     self.circle_pos_y = self.rect.center[1]
-            self.circle_radius += 5
-            if self.circle_radius >= self.max_circle_radius:
+                
+            if self.circle_timer >= self.circle_time:
+                self.speed = 0
+                self.atk = random.randint(1,5)
+                # if self.circle_pos_x == -1:
+                #     self.circle_pos_x = self.rect.center[0]
+                # if self.circle_pos_y == -1:
+                #     self.circle_pos_y = self.rect.center[1]
+                self.circle_radius += 5
+                if self.circle_radius >= self.max_circle_radius:
+                    self.circle_timer = 0
+            else:
+                # print("nocircle")
+                self.circle_timer += 1
+                self.circle_radius = 20
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+        elif self.atk == 1:
+            self.boom(str(self.frame))
+            self.frame += 1
+        elif self.atk == 2:
+            self.berry(str(self.frame))
+            self.frame += 1
+        elif self.atk == 3:
+            self.transformation(str(self.frame))
+            self.frame += 1
+        elif self.atk == 4:
+            self.flash(str(self.frame))
+            self.frame += 1
+        elif self.atk == 5:
+            self.superboom(str(self.frame))
+            self.frame += 1
+        
+
+    def boom(self, frame):
+        if self.transformed:
+            file_num = frame
+            while len(file_num) < 4:
+                file_num = "0"+file_num
+            file = "assets/animations/plant - boomboom/frame"+file_num+".png"
+            if os.path.exists(file):
+                print(file)
+                center = self.rect.center
+                self.image = pygame.image.load(file)
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                print(file)
+                self.atk = None
+                self.frame = 0
                 self.circle_timer = 0
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+                center = self.rect.center
+                self.image = pygame.image.load("assets/images/plant_angry.png")
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
         else:
-            # print("nocircle")
-            self.circle_timer += 1
-            self.circle_radius = 20
-            # self.circle_pos_x = -1
-            # self.circle_pos_y = -1
-            self.speed = 3
+            self.atk = None
+            self.frame = 0
+
+    def berry(self, frame):
+        if not(self.transformed):
+            file_num = frame
+            while len(file_num) < 4:
+                file_num = "0"+file_num
+            file = "assets/animations/plant - red berry attack/frame"+file_num+".png"
+            if os.path.exists(file):
+                print(file)
+                center = self.rect.center
+                self.image = pygame.image.load(file)
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                print(file)
+                self.atk = None
+                self.frame = 0
+                self.circle_timer = 0
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+                center = self.rect.center
+                self.image = pygame.image.load("assets/images/plant.png")
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+        else:
+            self.atk = None
+            self.frame = 0
+            
+    def transformation(self, frame):
+        if not(self.transformed):
+            
+            file_num = frame
+            while len(file_num) < 4:
+                file_num = "0"+file_num
+            file = "assets/animations/plant - transformation/frame"+file_num+".png"
+            if os.path.exists(file):
+                print(file)
+                center = self.rect.center
+                self.image = pygame.image.load(file)
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                print(file)
+                self.atk = None
+                self.frame = 0
+                self.circle_timer = 0
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+                center = self.rect.center
+                self.image = pygame.image.load("assets/images/plant_angry.png")
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+                self.transformed = True
+        else:
+            self.atk = None
+            self.frame = 0
+
+    def flash(self, frame):
+        if self.transformed:
+            self.transformed = True
+            file_num = frame
+            while len(file_num) < 4:
+                file_num = "0"+file_num
+            file = "assets/animations/plant - white flash/frame"+file_num+".png"
+            if os.path.exists(file):
+                print(file)
+                center = self.rect.center
+                self.image = pygame.image.load(file)
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                print(file)
+                self.atk = None
+                self.frame = 0
+                self.circle_timer = 0
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+                center = self.rect.center
+                self.image = pygame.image.load("assets/images/plant_angry.png")
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+        else:
+            self.atk = None
+            self.frame = 0
+            
+    def superboom(self, frame):
+        if self.transformed:
+            file_num = frame
+            while len(file_num) < 4:
+                file_num = "0"+file_num
+            file = "assets/animations/plant- supermegaboomboom/frame"+file_num+".png"
+            if os.path.exists(file):
+                print(file)
+                center = self.rect.center
+                self.image = pygame.image.load(file)
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                print(file)
+                self.atk = None
+                self.frame = 0
+                self.circle_timer = 0
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+                center = self.rect.center
+                self.image = pygame.image.load("assets/images/plant_angry.png")
+                self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *0.8), int(self.image.get_height()*0.8)))
+                self.image.set_colorkey((0,0,0))
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.mask = pygame.mask.from_surface(self.image)
+        else:
+            self.atk = None
+            self.frame = 0
+            
 
     
 

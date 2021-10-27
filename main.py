@@ -1,11 +1,13 @@
 import pygame
-from scenes.scenes import CastleScene
+from scenes.scenes import CastleScene, Start
 
 def run_game(width, height, fps, starting_scene):
     pygame.init()
     screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
-    
+    pygame.display.set_caption('Trick, Treat or Slay')
+    image = pygame.image.load("assets/images/player.png")
+    pygame.display.set_icon(image)
     active_scene = starting_scene()
 
     while active_scene != None:
@@ -40,4 +42,4 @@ def run_game(width, height, fps, starting_scene):
         clock.tick(fps)
 
 # Change parameters here for different screen sizes, FPS and starting scenes
-run_game(1200, 800, 30, CastleScene)
+run_game(1200, 800, 30, Start)

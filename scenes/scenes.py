@@ -4,7 +4,7 @@ from helpers.enemy import Alfredo, Bob, MuscleBoi, Plant, PomPom
 from helpers.player import Player
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
 from helpers.room import BossRoom, Room, TreatRoom, TrickRoom
-from helpers.ui import UI
+from helpers.ui import UI, Text
 
 boss_list = [Plant, PomPom, MuscleBoi]
 random.shuffle(boss_list)
@@ -39,7 +39,7 @@ class SceneBase:
         if background_music:
             pygame.mixer.init()
             pygame.mixer.music.load(background_music)
-            # pygame.mixer.music.play(-1)
+            pygame.mixer.music.play(-1)
             pass
     
     def ProcessInput(self, events, pressed_keys):
@@ -69,6 +69,8 @@ class SceneBase:
         if self.current_room.screen == None:
             self.current_room.screen = self.screen
         
+        if self.player.current_health <= 0:
+            self.SwitchToScene(End())
         
         self.current_room.update()
         self.all_sprites.update()
@@ -167,7 +169,70 @@ class CaveScene(SceneBase):
         SceneBase.__init__(self, "assets/images/2nd_floor.png", "assets/music/cave_song.wav", DungeonScene, player, 10)
         self.generateFloor(0.05)
 
-class DungeonScene(SceneBase, Player):
+class DungeonScene(SceneBase):
     def __init__(self, player):
         SceneBase.__init__(self, "assets/images/3rd_floor.png", "assets/music/dungeon_song.wav", CaveScene, player, 20)
         self.generateFloor(0.005)
+
+class End(SceneBase):
+    def __init__(self):
+        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites.add(Text("Game Over", 50, (0,0,0), 1000, 1000, 600, 300))
+        self.all_sprites.add(Text("Press space to start over", 50, (0,0,0), 1000, 1000, 600, 400))
+        self.background_img = pygame.image.load("assets/images/1st_floor.png")
+        self.background_img = pygame.transform.scale(self.background_img, (1200,800))
+        self.background_img.get_rect().center = (600, 400)
+        self.next = self
+        pygame.mixer.init()
+        pygame.mixer.music.load('assets/music/SynthTest.wav')
+        pygame.mixer.music.play(-1)
+    
+    def ProcessInput(self, events, pressed_keys):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.SwitchToScene(CastleScene())
+        return
+
+    def Update(self):
+        self.all_sprites.update()
+        return
+
+    def Render(self, screen):
+    
+        screen.blit(self.background_img, (0,0))
+        
+        
+        self.all_sprites.draw(screen)
+
+class Start(SceneBase):
+    def __init__(self):
+        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites.add(Text("Trick, Treat or Slay", 60, (0,0,0), 1000, 1000, 600, 300))
+        self.all_sprites.add(Text("Press space to start game", 50, (0,0,0), 1000, 1000, 600, 400))
+        self.background_img = pygame.image.load("assets/images/1st_floor.png")
+        self.background_img = pygame.transform.scale(self.background_img, (1200,800))
+        self.background_img.get_rect().center = (600, 400)
+        self.next = self
+        pygame.mixer.init()
+        pygame.mixer.music.load('assets/music/SynthTest.wav')
+        pygame.mixer.music.play(-1)
+    
+    def ProcessInput(self, events, pressed_keys):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.SwitchToScene(CastleScene())
+        return
+
+    def Update(self):
+        self.all_sprites.update()
+        return
+
+    def Render(self, screen):
+    
+        screen.blit(self.background_img, (0,0))
+        
+        
+        self.all_sprites.draw(screen)
+        
