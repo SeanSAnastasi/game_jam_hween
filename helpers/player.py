@@ -16,10 +16,10 @@ class Player(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
         # Base Stats
-        self.movement_speed = 5
-        self.damage = 1
+        self.movement_speed = 7
+        self.damage = 2
         self.shot_speed = 10
-        self.shot_delay = 1
+        self.shot_delay = 2
         self.max_health = 5
         self.current_health = self.max_health  
 

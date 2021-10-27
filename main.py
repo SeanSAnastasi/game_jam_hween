@@ -10,7 +10,6 @@ def run_game(width, height, fps, starting_scene):
 
     while active_scene != None:
         pressed_keys = pygame.key.get_pressed()
-        
         # Event filtering
         filtered_events = []
         for event in pygame.event.get():

@@ -1,10 +1,13 @@
 import pygame
 import random
+from helpers.enemy import Alfredo, Bob, MuscleBoi, Plant, PomPom
 from helpers.player import Player
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
 from helpers.room import BossRoom, Room, TreatRoom, TrickRoom
 from helpers.ui import UI
 
+boss_list = [Plant, PomPom, MuscleBoi]
+random.shuffle(boss_list)
 
 class SceneBase:
 
@@ -133,13 +136,13 @@ class SceneBase:
         choice = random.choice(boss_directions)
 
         if choice == "north":
-            last_room.setNorth(BossRoom(self.player))
+            last_room.setNorth(BossRoom(self.player, boss_list.pop()))
         elif choice == "south":
-            last_room.setSouth(BossRoom(self.player))
+            last_room.setSouth(BossRoom(self.player, boss_list.pop()))
         elif choice == "east":
-            last_room.setEast(BossRoom(self.player))
+            last_room.setEast(BossRoom(self.player, boss_list.pop()))
         elif choice == "west":
-            last_room.setWest(BossRoom(self.player))
+            last_room.setWest(BossRoom(self.player, boss_list.pop()))
 
             
             
@@ -156,7 +159,7 @@ class SceneBase:
 
 class CastleScene(SceneBase):
     def __init__(self):
-        SceneBase.__init__(self, "assets/images/1st_floor.png", "assets/music/castle_song.wav", CaveScene, Player(), 5)
+        SceneBase.__init__(self, "assets/images/1st_floor.png", "assets/music/castle_song.wav", CaveScene, Player(), 1)
         self.generateFloor(0.1)
 
 class CaveScene(SceneBase):

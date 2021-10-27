@@ -1,6 +1,7 @@
 import pygame
 import math
 import random
+import os
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -192,12 +193,157 @@ class MuscleBoi(Enemy):
         super().__init__("assets/images/muscle_boi.png", 600, 400, 1)
         self.max_health = 35
         self.current_health = self.max_health
+        self.player = player
+        self.circle_time = 60
+        self.circle_timer = 0
+        self.circle_radius = 20
+        self.max_circle_radius = 200
+        self.screen = None
+        self.circle_pos_x = -1
+        self.circle_pos_y = -1
+        self.atk = None
+        self.frame = 0
+    def update(self):
+        if self.atk == None:
+            dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
+            dist = math.hypot(dx, dy)
+            try:
+                dx, dy = dx / dist, dy / dist  # Normalize.
+                # Move along this normalized vector towards the player at current speed.
+                self.rect.x += dx * self.speed
+                self.rect.y += dy * self.speed
+            except:
+                print("under you")
+            
+                
+            if self.circle_timer >= self.circle_time:
+                self.speed = 0
+                self.atk = random.randint(1,3)
+                # if self.circle_pos_x == -1:
+                #     self.circle_pos_x = self.rect.center[0]
+                # if self.circle_pos_y == -1:
+                #     self.circle_pos_y = self.rect.center[1]
+                self.circle_radius += 5
+                if self.circle_radius >= self.max_circle_radius:
+                    self.circle_timer = 0
+            else:
+                # print("nocircle")
+                self.circle_timer += 1
+                self.circle_radius = 20
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+        elif self.atk == 1:
+            self.charge(str(self.frame))
+            self.frame += 1
+        elif self.atk == 2:
+            self.attack(str(self.frame))
+            self.frame += 1
+        elif self.atk == 3:
+            self.swirl(str(self.frame))
+            self.frame += 1
+
+    def charge(self, frame):
+        file_num = frame
+        while len(file_num) < 4:
+            file_num = "0"+file_num
+        file = "assets/animations/ghost - 1 arm charge/frame"+file_num+".png"
+        if os.path.exists(file):
+            print(file)
+            center = self.rect.center
+            self.image = pygame.image.load(file)
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            print(file)
+            self.atk = None
+            self.frame = 0
+            self.circle_timer = 0
+            # self.circle_pos_x = -1
+            # self.circle_pos_y = -1
+            self.speed = 3
+            center = self.rect.center
+            self.image = pygame.image.load("assets/images/muscle_boi.png")
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+    def attack(self, frame):
+        file_num = frame
+        while len(file_num) < 4:
+            file_num = "0"+file_num
+        file = "assets/animations/ghost - 2 arms attack/frame"+file_num+".png"
+        if os.path.exists(file):
+            print(file)
+            center = self.rect.center
+            self.image = pygame.image.load(file)
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            print(file)
+            self.atk = None
+            self.frame = 0
+            self.circle_timer = 0
+            # self.circle_pos_x = -1
+            # self.circle_pos_y = -1
+            self.speed = 3
+            center = self.rect.center
+            self.image = pygame.image.load("assets/images/muscle_boi.png")
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+    def swirl(self, frame):
+        file_num = frame
+        while len(file_num) < 4:
+            file_num = "0"+file_num
+        file = "assets/animations/ghost - swirl attack/frame"+file_num+".png"
+        if os.path.exists(file):
+            print(file)
+            center = self.rect.center
+            self.image = pygame.image.load(file)
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            print(file)
+            self.atk = None
+            self.frame = 0
+            self.circle_timer = 0
+            # self.circle_pos_x = -1
+            # self.circle_pos_y = -1
+            self.speed = 3
+            center = self.rect.center
+            self.image = pygame.image.load("assets/images/muscle_boi.png")
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+
 
 class Alfredo(Enemy):
     def __init__(self, player):
         super().__init__("assets/images/alfredo.png", 600, 400, 1)
         self.max_health = 20
         self.current_health = self.max_health
+        self.circle_time = 60
+        self.circle_timer = 0
+        self.circle_radius = 20
+        self.max_circle_radius = 200
+        self.screen = None
+        self.circle_pos_x = -1
+        self.circle_pos_y = -1
 
 class Bob(Enemy):
     def __init__(self, player):
@@ -210,3 +356,192 @@ class Plant(Enemy):
         super().__init__("assets/images/plant.png", 600, 400, 1)
         self.max_health = 30
         self.current_health = self.max_health
+        self.player = player
+        self.circle_time = 60
+        self.circle_timer = 0
+        self.circle_radius = 20
+        self.max_circle_radius = 200
+        self.screen = None
+        self.circle_pos_x = -1
+        self.circle_pos_y = -1
+    
+    def update(self):
+        # pygame.draw.circle(self.screen, (255, 20, 0), (600, 400), 20, 2)
+         # Find direction vector (dx, dy) between enemy and player.
+        dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
+        dist = math.hypot(dx, dy)
+        try:
+            dx, dy = dx / dist, dy / dist  # Normalize.
+            # Move along this normalized vector towards the player at current speed.
+            self.rect.x += dx * self.speed
+            self.rect.y += dy * self.speed
+        except:
+            print("under you")
+        
+            
+        if self.circle_timer >= self.circle_time:
+            self.speed = 0
+            # if self.circle_pos_x == -1:
+            #     self.circle_pos_x = self.rect.center[0]
+            # if self.circle_pos_y == -1:
+            #     self.circle_pos_y = self.rect.center[1]
+            self.circle_radius += 5
+            if self.circle_radius >= self.max_circle_radius:
+                self.circle_timer = 0
+        else:
+            # print("nocircle")
+            self.circle_timer += 1
+            self.circle_radius = 20
+            # self.circle_pos_x = -1
+            # self.circle_pos_y = -1
+            self.speed = 3
+
+    
+
+class PomPom(Enemy):
+    def __init__(self, player):
+        super().__init__("assets/images/pompom.png", 600, 400, 1)
+        self.max_health = 30
+        self.current_health = self.max_health
+        self.player = player
+        self.circle_time = 60
+        self.circle_timer = 0
+        self.circle_radius = 20
+        self.max_circle_radius = 200
+        self.screen = None
+        self.circle_pos_x = -1
+        self.circle_pos_y = -1
+        self.atk = None
+        self.frame = 0
+    def update(self):
+        # pygame.draw.circle(self.screen, (255, 20, 0), (600, 400), 20, 2)
+         # Find direction vector (dx, dy) between enemy and player.
+        if self.atk == None:
+            dx, dy = self.player.rect.x - self.rect.x, self.player.rect.y - self.rect.y
+            dist = math.hypot(dx, dy)
+            try:
+                dx, dy = dx / dist, dy / dist  # Normalize.
+                # Move along this normalized vector towards the player at current speed.
+                self.rect.x += dx * self.speed
+                self.rect.y += dy * self.speed
+            except:
+                print("under you")
+            
+                
+            if self.circle_timer >= self.circle_time:
+                self.speed = 0
+                self.atk = random.randint(1,3)
+                # if self.circle_pos_x == -1:
+                #     self.circle_pos_x = self.rect.center[0]
+                # if self.circle_pos_y == -1:
+                #     self.circle_pos_y = self.rect.center[1]
+                self.circle_radius += 5
+                if self.circle_radius >= self.max_circle_radius:
+                    self.circle_timer = 0
+            else:
+                # print("nocircle")
+                self.circle_timer += 1
+                self.circle_radius = 20
+                # self.circle_pos_x = -1
+                # self.circle_pos_y = -1
+                self.speed = 3
+        elif self.atk == 1:
+            self.kick_swirl(str(self.frame))
+            self.frame += 1
+        elif self.atk == 2:
+            self.laser_beam(str(self.frame))
+            self.frame += 1
+        elif self.atk == 3:
+            self.pink_throw(str(self.frame))
+            self.frame += 1
+        
+
+    def kick_swirl(self, frame):
+        file_num = frame
+        while len(file_num) < 4:
+            file_num = "0"+file_num
+        file = "assets/animations/pompom - kick swirl/frame"+file_num+".png"
+        if os.path.exists(file):
+            print(file)
+            center = self.rect.center
+            self.image = pygame.image.load(file)
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            print(file)
+            self.atk = None
+            self.frame = 0
+            self.circle_timer = 0
+            # self.circle_pos_x = -1
+            # self.circle_pos_y = -1
+            self.speed = 3
+            center = self.rect.center
+            self.image = pygame.image.load("assets/images/pompom.png")
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+        
+    def laser_beam(self, frame):
+        file_num = frame
+        while len(file_num) < 4:
+            file_num = "0"+file_num
+        file = "assets/animations/pompom - laser beam/frame"+file_num+".png"
+        if os.path.exists(file):
+            print(file)
+            center = self.rect.center
+            self.image = pygame.image.load(file)
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            print(file)
+            self.atk = None
+            self.frame = 0
+            self.circle_timer = 0
+            # self.circle_pos_x = -1
+            # self.circle_pos_y = -1
+            self.speed = 3
+            center = self.rect.center
+            self.image = pygame.image.load("assets/images/pompom.png")
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+    def pink_throw(self, frame):
+        file_num = frame
+        while len(file_num) < 4:
+            file_num = "0"+file_num
+        file = "assets/animations/pompom - pink throw/frame"+file_num+".png"
+        if os.path.exists(file):
+            # print(self.img)
+            center = self.rect.center
+            self.image = pygame.image.load(file)
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)
+            # print(self.img)
+        else:
+            print(file)
+            self.atk = None
+            self.frame = 0
+            self.circle_timer = 0
+            # self.circle_pos_x = -1
+            # self.circle_pos_y = -1
+            self.speed = 3
+            center = self.rect.center
+            self.image = pygame.image.load("assets/images/pompom.png")
+            self.image = pygame.transform.scale(self.image, (int(self.image.get_width() *1), int(self.image.get_height()*1)))
+            self.image.set_colorkey((0,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+            self.mask = pygame.mask.from_surface(self.image)

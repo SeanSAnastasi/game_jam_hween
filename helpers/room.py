@@ -7,7 +7,7 @@ from helpers.obstacle import Bonepile, Chest, Gravestone, Rock, Web
 from helpers.player import Player, Shot
 from helpers.item import Syringe, Bottle, Flask, ChocBar, Candy
 from helpers.door import Door, NorthDoor, SouthDoor, TrapDoor, WestDoor, EastDoor
-from helpers.enemy import Alfredo, MuscleBoi, Plant, Spider, Draugr, Ghost, Golem, Bob
+from helpers.enemy import Alfredo, MuscleBoi, Plant, PomPom, Spider, Draugr, Ghost, Golem, Bob
 from helpers.ui import FullHeart
 
 class Room():
@@ -34,7 +34,7 @@ class Room():
         self.west = None
         self.east = None
 
-        self.obstacle_sprite_group.add(Chest(5,5))
+        self.enemy_sprite_group.add(MuscleBoi(self.player))
 
     def update(self):
         
@@ -263,10 +263,10 @@ class TreatRoom(Room):
             self.player.updateStats(item.get_change())
 
 class BossRoom(Room):
-    def __init__(self, player):
+    def __init__(self, player, enemy):
         super().__init__(player)
-        enemy_list = [Alfredo, Bob, MuscleBoi, Plant]
-        enemy = random.choice(enemy_list)
+        # enemy_list = [Alfredo, Bob, MuscleBoi] if enemies == None else enemies
+        # enemy = random.choice(enemy_list)
         self.boss = enemy(player)
         self.enemy_sprite_group.add(self.boss)
         # Add random obstacles max 10
